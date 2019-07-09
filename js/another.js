@@ -19,8 +19,7 @@
 // +--------------------------------------+
 // |  SET YOUR GOOGLE API KEY RIGHT HERE  |
 // +--------------------------------------+
-//var key = '<GOOGLE_FONTS_API_KEY>';
-var key = 'AIzaSyDsDExcOFxm5p8lswjSa5IckTJf3TS6ByI';
+var key = '<GOOGLE_FONTS_API_KEY>';
 
 var xhr = new XMLHttpRequest();
 var fonts = [];
@@ -104,8 +103,8 @@ function loadfonts (e) {
 		loadsys ('#custom-font');
 	}
 	if (type == 'google') {
-		$('#font-selector').val(localStorage['font'] || 'Marlow');
-		loadfont(localStorage['font'] || 'Marlow');
+		$('#font-selector').val(localStorage['font'] || 'Barlow');
+		loadfont(localStorage['font'] || 'Barlow');
 	}
 }
 
