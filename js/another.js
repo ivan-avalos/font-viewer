@@ -25,7 +25,28 @@ var xhr = new XMLHttpRequest();
 var fonts = [];
 var fontcache = [];
 
+var Size = Quill.import ('attributors/style/size');
+Quill.register(Size, true);
+
+// Initialise Quill editor
+var quill = new Quill('.editor', {
+	theme: 'snow'
+});
+
+if (localStorage['changed']) {
+	const content = JSON.parse(localStorage['content']);
+	quill.setContents(content);
+}
+
+quill.on('text-change', function (d, od, source) {
+	if (source == 'user') {
+		localStorage['changed'] = true;
+		localStorage['content'] = JSON.stringify(quill.getContents());
+	}
+});
+
 $(document).ready(function () {
+
 	// Load font list from Google Fonts
 	xhr.open('GET', 'https://www.googleapis.com/webfonts/v1/webfonts?key=' + key, true);
 	xhr.send();
@@ -34,6 +55,17 @@ $(document).ready(function () {
 	$('#font-selector').on('change', function () {
 		loadfont(this.value);
 	});
+	
+	// Load colours from cookies
+	if (colour = localStorage['bg-colour']) {
+		$('#bg-colour').val(colour);
+		setbgcolour();
+	}
+
+	if (colour = localStorage['text-colour']) {
+		$('#text-colour').val(colour);
+		setcolour(colour);
+	}
 });
 function loadfonts (e) {
 	if (xhr.readyState == 4 && xhr.status == 200) {
@@ -76,6 +108,8 @@ function loadfonts (e) {
 	}
 }
 
+// MARK: - Font funtions
+
 function randomfont () {
 	const font = fonts[Math.floor(Math.random()*fonts.length)];
 	$('#font-selector').val(font);
@@ -93,12 +127,14 @@ function insertcdn () {
 function loadsys (selector) {
 	const font = $(selector).val();
 	$('body').css ('font-family', font);
+	$('.editor').css ('font-family', font);
 	localStorage['type'] = 'system';
 	localStorage['font'] = font;
 }
 
 function loadfont (font) {
 	$('body').css('font-family', font);
+	$('.editor').css('font-family', font);
 	localStorage['type'] = 'google';
 	localStorage['font'] = font;
 	if (fontcache.includes(font)) {
@@ -134,6 +170,33 @@ function storecdn (cdn) {
 	localStorage['cdns'] = JSON.stringify(cdns);
 }
 
+// MARK: - Colour functions
+
+function setbgcolour () {
+	const colour = $('#bg-colour').val();
+	$('body').css('background-color', colour);
+	localStorage['bg-colour'] = colour;
+	$('*').each (function () {
+		$(this).removeClass('bg-light');
+		$(this).removeClass('text-dark');
+		$(this).css('background-color', colour);
+	});
+}
+
+function setcolour () {
+	const colour = $('#text-colour').val();
+	$('body').css('color', colour);
+	localStorage['text-colour'] = colour;
+	$('*').each (function () {
+		$(this).removeClass('text-dark');
+		$(this).css('color', colour);
+		$(this).css('border-color', colour);
+	})
+}
+
+// MARK: - Storage functions
+
 function clearstorage () {
 	localStorage.clear();
+	location.reload();
 }
